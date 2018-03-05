@@ -1,5 +1,5 @@
 # coding=utf-8
-# coding=utf-8
+
 import requests
 from lxml import etree
 from dama import indetify
@@ -21,7 +21,6 @@ from item_dumpkey import Item_dump
 # 拼接参数，发送GET请求
 # 下载源代码保存到本地
 # 用retry装饰函数，如果验证码错误就抛异常，最多尝试5次
-
 # 根据传过来的参数发送请求检索是否有诉信息
 # 如果没有则返回一个空列表
 # 如果有则遍历每一行信息，并把字段添加到一个列表中
@@ -29,7 +28,6 @@ from item_dumpkey import Item_dump
 
 proxyHost = "http-dyn.abuyun.com"
 proxyPort = "9020"
-
 
 proxyUser = "H65403216IJKN42D"
 proxyPass = "55697F9CCB86225E"
@@ -187,7 +185,7 @@ class ZhixingSpider:
 
     def run(self):
         # 给验证码的url拼接16位随机数
-        company_list = read_company2(self.path)
+        company_list = read_company1(self.path)
 
         for company in company_list:
             i = Item_dump(company)
@@ -220,7 +218,8 @@ class ZhixingSpider:
 
 
 if __name__ == '__main__':
-    path = sys.argv[1]
+    # path = sys.argv[1]
+    path = '/home/python/Desktop/company/sz_total.csv'
     company = "广西五鸿建设集团有限公司"
     # company = ZhixingSpider(path=path, proxies=proxies)
     company = ZhixingSpider(path=path)

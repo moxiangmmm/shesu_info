@@ -14,6 +14,7 @@ import sys
 from read_company import read_company1, read_company2
 from item_dumpkey import Item_dump
 import concurrent.futures
+from damatuWeb import DamatuApi
 
 
 # 使用多线程打码准确率不高，不建议使用
@@ -57,7 +58,7 @@ def get_detail(html, captcha, headers, company):
                 detail_url = "http://zhixing.court.gov.cn/search/newdetail?id={}&j_captcha={}&captchaId=fda97538121240b38b0c73eeac144dbe&_={}".format(id, captcha, time_id)
                 # 发送请求
                 try:
-                    ret = requests.get(detail_url, headers=headers, timeout=60, proxies=proxies)
+                    ret = requests.get(detail_url, headers=headers, timeout=60)
                 except Exception as e:
                     with open("log/shesu_log.log", 'a') as f:
                         now = str(datetime.datetime.now())
@@ -111,8 +112,11 @@ def _search_company(company, captcha_url):
     ua = u.rand_chose()
     headers = {'User-Agent': ua}
     try:
-        captcha_response = requests.get(captcha_url, headers=headers, timeout=60, proxies=proxies)
-        captcha = indetify(captcha_response.content)
+        captcha_response = requests.get(captcha_url, headers=headers, timeout=60)
+        # captcha = indetify(captcha_response.content)
+        dmt = DamatuApi("469819183", "54188")
+        captcha = dmt.decode(captcha_response.content, 42)
+
     except Exception as e:
         print(e)
         with open("log/shesu_log.log", 'a') as f:
@@ -130,7 +134,7 @@ def _search_company(company, captcha_url):
         "captchaId": "fda97538121240b38b0c73eeac144dbe"
     }
     # print(post_data)
-    resp = requests.post('http://zhixing.court.gov.cn/search/newsearch', data=post_data, headers=headers,timeout=60, proxies=proxies)
+    resp = requests.post('http://zhixing.court.gov.cn/search/newsearch', data=post_data, headers=headers,timeout=60)
     print("查询++++++++++", resp.status_code)
     content = resp.content.decode()
     html = etree.HTML(content)
@@ -189,6 +193,18 @@ def run_text(path):
     except KeyboardInterrupt:
         print("stopped by hand")
 
+def text_dama():
+    u = Rand_ua()
+    ua = u.rand_chose()
+    headers = {'User-Agent': ua}
+    captcha_url = 'http://zhixing.court.gov.cn/search/captcha.do?captchaId=fda97538121240b38b0c73eeac144dbe&random={}'.format(random.randint(999999999999999, 9999999999999999) / 10000000000000000)
+    response = requests.get(captcha_url,headers=headers)
+    print(type(response.content))
+    dmt = DamatuApi("469819183","54188")
+    ret = dmt.decode(response.content,42)
+    print(ret)
+
+
 # 获取验证码之后对接打码平台
 
 # 携带验证码搜索公司信息
@@ -200,3 +216,4 @@ def run_text(path):
 if __name__ == '__main__':
     # path = sys.argv[1]
     run_text('/home/python/Desktop/company/sz_total.csv')
+    # text_dama()
